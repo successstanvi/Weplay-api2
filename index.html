@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WePlay UID Lookup</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:700px;margin:50px auto;padding:20px}
+    input,button{padding:12px;font-size:16px}
+    input{width:65%;box-sizing:border-box}
+    button{cursor:pointer}
+    #result{white-space:pre-wrap;margin-top:25px}
+    #avatar{width:120px;height:120px;object-fit:cover;border-radius:50%;display:none;margin-top:20px}
+  </style>
+</head>
+<body>
+  <h1>WePlay UID Lookup 🚀</h1>
+  <form id="form">
+    <input id="uid" placeholder="Enter UID" inputmode="numeric" required>
+    <button>Search</button>
+  </form>
+  <img id="avatar" alt="Avatar">
+  <pre id="result"></pre>
+
+  <script>
+    const form=document.getElementById("form");
+    const result=document.getElementById("result");
+    const avatar=document.getElementById("avatar");
+
+    form.addEventListener("submit", async e=>{
+      e.preventDefault();
+      result.textContent="Searching...";
+      avatar.style.display="none";
+
+      try{
+        const r=await fetch("/api",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({uid:document.getElementById("uid").value.trim()})
+        });
+        const data=await r.json();
+        result.textContent=JSON.stringify(data,null,2);
+        if(data.avatar){
+          avatar.src=data.avatar;
+          avatar.style.display="block";
+        }
+      }catch(err){
+        result.textContent=JSON.stringify({error:err.message},null,2);
+      }
+    });
+  </script>
+</body>
+</html>
